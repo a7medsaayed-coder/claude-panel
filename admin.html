@@ -41,7 +41,7 @@ let rows = [], sortKey = "last_seen", sortDir = -1, latest = "";
 const ago = (t) => { if (!t) return "—"; const m = Math.round((Date.now() - new Date(t)) / 60000);
   return m < 1 ? "الآن" : m < 60 ? "منذ " + m + " د" : m < 1440 ? "منذ " + Math.round(m / 60) + " س" : m < 43200 ? "منذ " + Math.round(m / 1440) + " يوم" : new Date(t).toLocaleDateString("ar-EG"); };
 const vnum = (v) => String(v || "0").split(".").map(Number), vcmp = (a, b) => { a = vnum(a); b = vnum(b); for (let i = 0; i < 3; i++) if ((a[i] || 0) !== (b[i] || 0)) return (a[i] || 0) - (b[i] || 0); return 0; };
-const osName = (o) => /win/i.test(o) ? "Windows" : /darwin|mac/i.test(o) ? "Mac" : (o || "—");
+const osName = (o) => /^win|windows/i.test(o) ? "Windows" : /darwin|mac/i.test(o) ? "Mac" : (o || "—");
 
 function gate(msg, err) {
   $("#app").innerHTML = `<div class="gate"><div class="logo" style="margin:0 auto 14px">✳</div><h1 style="flex:none">مستخدمو Claude Panel</h1>
