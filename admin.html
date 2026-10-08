@@ -62,7 +62,7 @@ const vnum = (v) => String(v || "0").split(".").map(Number), vcmp = (a, b) => { 
 const osName = (o) => /^win|windows/i.test(o) ? "Windows" : /darwin|mac/i.test(o) ? "Mac" : (o || "—");
 const toast = (t) => { const d = document.createElement("div"); d.className = "toast"; d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), 2600); };
 const name = (id) => (S.users.find((u) => u.id === id) || {}).name || "مستخدم محذوف";
-const KIND = { beta_request: "طلب التحديثات التجريبية", beta_cancel: "ألغى طلب التجريبي", open: "فتح البانل", chat: "رسالة لـ Claude", tool: "أداة", route: "أمر سريع", error: "خطأ", test: "اختبار" };
+const KIND = { report_ok: "قال إن مشكلته حلت", report_no: "قال إن مشكلته لم تحل", beta_request: "طلب التحديثات التجريبية", beta_cancel: "ألغى طلب التجريبي", open: "فتح البانل", chat: "رسالة لـ Claude", tool: "أداة", route: "أمر سريع", error: "خطأ", test: "اختبار" };
 
 function gate(msg, err) {
   $("#app").innerHTML = `<div class="gate"><div class="logo" style="margin:0 auto 14px">✳</div><h1 style="flex:none">لوحة Claude Panel</h1>
@@ -96,6 +96,8 @@ function render() {
 }
 // ---------- users ----------
 // a user asked for early updates in the panel (event beta_request, latest of request/cancel) and is not on beta yet
+// the sender's answer to «هل حلت المشكلة؟» in the panel (event report_ok / report_no, tool = report id; the latest wins)
+const verdict = (id) => { const e = S.events.find((x) => (x.kind === "report_ok" || x.kind === "report_no") && x.tool === String(id)); return !e ? "" : e.kind === "report_ok" ? '<span class="tag ok ar">المستخدم: حلت</span>' : '<span class="tag bad ar">المستخدم: لم تحل</span>'; };
 const betaReq = (id) => { const e = S.events.find((x) => x.user_id === id && (x.kind === "beta_request" || x.kind === "beta_cancel")); return !!e && e.kind === "beta_request" && !(S.admin[id] || {}).beta; };
 function paneUsers() {
   const now = Date.now(), d = (r) => now - new Date(r.last_seen);
@@ -177,7 +179,7 @@ function paneReports() {
   $("#pane").innerHTML = `<div class="tools"><select id="rf"><option value="open">المفتوحة</option><option value="done">تم حلها</option><option value="all">الكل</option></select>
     <span class="sub">كل بلاغ موجود أيضا على GitHub. الرد هنا يظهر لصاحبه في البانل.</span></div>
     ${list.map((r) => `<div class="card"><div class="t"><b>${esc(r.title || "")}</b><span class="tag ${r.status === "open" ? "warn" : "ok"} ar">${r.status === "open" ? "مفتوح" : "تم الحل"}</span>
-      ${r.github ? `<a class="tag" target="_blank" href="https://github.com/a7medsaayed-coder/claude-panel-reports/issues/${r.github}">GitHub #${r.github}</a>` : ""}</div>
+      ${r.github ? `<a class="tag" target="_blank" href="https://github.com/a7medsaayed-coder/claude-panel-reports/issues/${r.github}">GitHub #${r.github}</a>` : ""}${verdict(r.id)}</div>
       <p class="sub">${esc(name(r.user_id))} · ${ago(r.created_at)}</p><p>${esc(r.text || "")}</p>
       ${r.details ? `<details><summary class="sub">تفاصيل الجهاز والسجل</summary><pre style="white-space:pre-wrap;direction:ltr;text-align:left;font-size:12px">${esc(r.details)}</pre></details>` : ""}
       ${r.reply ? `<p><b>ردك:</b> ${esc(r.reply)}</p>` : ""}
