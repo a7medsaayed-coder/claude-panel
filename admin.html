@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>مستخدمو Claude Panel</title>
+<style>
+:root{--bg:#1f1e1d;--card:#2a2826;--card2:#33302d;--ink:#f3eee8;--ink2:#b9b2a9;--ink3:#857f78;--clay:#d97757;--ok:#5fb37a;--warn:#e0a93b;--line:#3a3734}
+@media (prefers-color-scheme:light){:root{--bg:#faf8f5;--card:#fff;--card2:#f4f0ea;--ink:#1f1e1d;--ink2:#5e5a55;--ink3:#8d877f;--line:#e6e1da}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 "IBM Plex Sans Arabic","Segoe UI",system-ui,sans-serif}
+main{max-width:1180px;margin:0 auto;padding:28px 16px 64px}
+header{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:22px}
+.logo{width:38px;height:38px;border-radius:11px;background:var(--clay);display:grid;place-items:center;color:#fff;font-size:20px;flex:none}
+h1{font-size:22px;margin:0;flex:1}.me{color:var(--ink3);font-size:13px}
+button{font:inherit;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:8px 14px;cursor:pointer}
+button.primary{background:var(--clay);border-color:var(--clay);color:#fff}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.kpi b{display:block;font-size:26px;font-variant-numeric:tabular-nums}.kpi span{color:var(--ink2);font-size:13px}
+.tools{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+input{font:inherit;flex:1;min-width:200px;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:9px 12px}
+.tbl{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:auto}
+table{width:100%;border-collapse:collapse;min-width:860px}
+th,td{padding:11px 12px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-size:12.5px;color:var(--ink3);font-weight:600;cursor:pointer;user-select:none;background:var(--card2);position:sticky;top:0}
+tr:last-child td{border-bottom:0}td.n{font-variant-numeric:tabular-nums;text-align:center}
+.who b{display:block}.who small{color:var(--ink3);direction:ltr;display:block;text-align:right}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-inline-end:6px;background:var(--ink3)}.dot.on{background:var(--ok)}
+.tag{display:inline-block;padding:1px 8px;border-radius:20px;font-size:12px;background:var(--card2);direction:ltr}.tag.old{background:rgba(224,169,59,.18);color:var(--warn)}
+.gate{max-width:420px;margin:12vh auto;text-align:center;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:32px 24px}
+.gate p{color:var(--ink2)}.err{color:#ff9a8f}.empty{padding:28px;text-align:center;color:var(--ink2)}
+@media (max-width:720px){.kpis{grid-template-columns:repeat(2,1fr)}h1{font-size:19px}}
+</style></head>
+<body><main id="app"><div class="gate"><p>جار التحميل…</p></div></main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script>
+// Users of the Claude panel (2026-10-08). Data: Supabase table panel_users. Only the developer's Google account can read every row
+// (row-level security policy "admin read all"); anyone else who opens this page sees nothing.
+const ADMIN = "a7medsaayed@gmail.com", URL_ = "https://vfwszdgbylmvywksddiu.supabase.co", KEY = "sb_publishable_htxZZdv0xjAF5icUCEuMMQ_0Nz8XVsa";
+const sb = supabase.createClient(URL_, KEY, { auth: { flowType: "pkce", detectSessionInUrl: true, persistSession: true } });
+const $ = (s) => document.querySelector(s), esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+let rows = [], sortKey = "last_seen", sortDir = -1, latest = "";
+const ago = (t) => { if (!t) return "—"; const m = Math.round((Date.now() - new Date(t)) / 60000);
+  return m < 1 ? "الآن" : m < 60 ? "منذ " + m + " د" : m < 1440 ? "منذ " + Math.round(m / 60) + " س" : m < 43200 ? "منذ " + Math.round(m / 1440) + " يوم" : new Date(t).toLocaleDateString("ar-EG"); };
+const vnum = (v) => String(v || "0").split(".").map(Number), vcmp = (a, b) => { a = vnum(a); b = vnum(b); for (let i = 0; i < 3; i++) if ((a[i] || 0) !== (b[i] || 0)) return (a[i] || 0) - (b[i] || 0); return 0; };
+const osName = (o) => /win/i.test(o) ? "Windows" : /darwin|mac/i.test(o) ? "Mac" : (o || "—");
+
+function gate(msg, err) {
+  $("#app").innerHTML = `<div class="gate"><div class="logo" style="margin:0 auto 14px">✳</div><h1 style="flex:none">مستخدمو Claude Panel</h1>
+    <p>${msg}</p>${err ? `<p class="err">${esc(err)}</p>` : ""}<button class="primary" id="in">الدخول بحساب Google</button></div>`;
+  $("#in").onclick = () => sb.auth.signInWithOAuth({ provider: "google", options: { redirectTo: location.origin + location.pathname } });
+}
+async function load() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) return gate("هذه اللوحة للمطور فقط.");
+  const { data, error } = await sb.from("panel_users").select("*").order("last_seen", { ascending: false });
+  if (error) return gate("تعذر قراءة المستخدمين.", error.message);
+  // the page only shows; the database decides (policy "admin read all"): any other account gets its own row at most
+  if (session.user.email !== ADMIN) { await sb.auth.signOut(); return gate("هذا الحساب (" + esc(session.user.email) + ") ليس حساب المطور."); }
+  rows = data || [];
+  latest = rows.map((r) => r.panel_version).filter((v) => /^\d+\.\d+\.\d+$/.test(v || "")).sort(vcmp).pop() || "";
+  render(session.user.email);
+}
+function render(me) {
+  const now = Date.now(), d = (r) => now - new Date(r.last_seen);
+  const k = { all: rows.length, day: rows.filter((r) => d(r) < 864e5).length, week: rows.filter((r) => d(r) < 7 * 864e5).length,
+    old: rows.filter((r) => latest && r.panel_version && vcmp(r.panel_version, latest) < 0).length };
+  $("#app").innerHTML = `<header><div class="logo">✳</div><h1>مستخدمو Claude Panel</h1><span class="me">${esc(me)}</span>
+      <button id="re">تحديث</button><button id="out">خروج</button></header>
+    <div class="kpis"><div class="kpi"><b>${k.all}</b><span>كل المستخدمين</span></div><div class="kpi"><b>${k.day}</b><span>نشط آخر 24 ساعة</span></div>
+      <div class="kpi"><b>${k.week}</b><span>نشط آخر 7 أيام</span></div><div class="kpi"><b>${k.old}</b><span>على نسخة قديمة${latest ? " (الأحدث " + esc(latest) + ")" : ""}</span></div></div>
+    <div class="tools"><input id="q" placeholder="ابحث بالاسم أو الإيميل أو الشركة…"></div>
+    <div class="tbl"><table><thead><tr>${[["name", "المستخدم"], ["work", "الشركة أو الوظيفة"], ["os", "الجهاز"], ["panel_version", "البانل"], ["claude_version", "Claude Code"],
+      ["premiere_version", "Premiere"], ["last_seen", "آخر ظهور"], ["first_seen", "أول ظهور"], ["opens", "مرات الفتح"], ["messages", "رسائل"], ["tool_runs", "أدوات"]]
+      .map(([key, l]) => `<th data-k="${key}">${l}${sortKey === key ? (sortDir < 0 ? " ↓" : " ↑") : ""}</th>`).join("")}</tr></thead><tbody id="tb"></tbody></table></div>`;
+  $("#re").onclick = load; $("#out").onclick = async () => { await sb.auth.signOut(); gate("خرجت من اللوحة."); };
+  document.querySelectorAll("th").forEach((th) => th.onclick = () => { sortDir = sortKey === th.dataset.k ? -sortDir : -1; sortKey = th.dataset.k; render(me); });
+  $("#q").oninput = body; body();
+}
+function body() {
+  const q = ($("#q").value || "").trim().toLowerCase(), now = Date.now();
+  const list = rows.filter((r) => !q || [r.name, r.email, r.work, r.machine].join(" ").toLowerCase().includes(q)).sort((a, b) => {
+    let x = a[sortKey], y = b[sortKey]; if (/version/.test(sortKey)) return sortDir * vcmp(x, y);
+    if (typeof x === "number" || typeof y === "number") return sortDir * ((x || 0) - (y || 0)); return sortDir * String(x || "").localeCompare(String(y || ""), "ar"); });
+  $("#tb").innerHTML = list.length ? list.map((r) => `<tr>
+    <td class="who"><b><span class="dot${now - new Date(r.last_seen) < 3.5 * 36e5 ? " on" : ""}"></span>${esc(r.name || "بدون اسم")}</b><small>${esc(r.email || "")}</small></td>
+    <td>${esc(r.work || "—")}</td><td title="${esc(r.os)} · ${esc(r.machine)}">${esc(osName(r.os))}</td>
+    <td><span class="tag${latest && r.panel_version && vcmp(r.panel_version, latest) < 0 ? " old" : ""}">${esc(r.panel_version || "—")}</span></td>
+    <td><span class="tag">${esc(r.claude_version || "—")}</span></td><td><span class="tag">${esc(r.premiere_version || "—")}</span></td>
+    <td title="${esc(r.last_seen)}">${ago(r.last_seen)}</td><td title="${esc(r.first_seen)}">${new Date(r.first_seen).toLocaleDateString("ar-EG")}</td>
+    <td class="n">${r.opens || 0}</td><td class="n">${r.messages || 0}</td><td class="n">${r.tool_runs || 0}</td></tr>`).join("")
+    : `<tr><td colspan="11" class="empty">${q ? "لا يوجد مستخدم بهذا البحث." : "لا يوجد مستخدمون بعد."}</td></tr>`;
+}
+sb.auth.onAuthStateChange((ev) => { if (ev === "SIGNED_IN") load(); });
+load().catch((e) => gate("حدث خطأ.", e.message));
+</script></body></html>
