@@ -1,0 +1,9 @@
+:root{--bg:#1f1e1d;--card:#2a2826;--ink:#f3eee8;--ink2:#b9b2a9;--clay:#d97757;--line:#3a3734}
+@media (prefers-color-scheme:light){:root{--bg:#faf8f5;--card:#fff;--ink:#1f1e1d;--ink2:#5e5a55;--line:#e6e1da}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.75 "IBM Plex Sans Arabic","Segoe UI",system-ui,sans-serif}
+main{max-width:760px;margin:0 auto;padding:48px 20px 64px}header{display:flex;align-items:center;gap:12px;margin-bottom:32px}
+.logo{width:40px;height:40px;border-radius:11px;background:var(--clay);display:grid;place-items:center;color:#fff;font-weight:700;font-size:22px}
+h1{font-size:28px;margin:0}h2{font-size:19px;margin:32px 0 8px}p,li{color:var(--ink2)}a{color:var(--clay)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin:16px 0}
+.en{direction:ltr;text-align:left;border-top:1px solid var(--line);margin-top:48px;padding-top:24px}
+footer{margin-top:48px;font-size:14px;color:var(--ink2)}
