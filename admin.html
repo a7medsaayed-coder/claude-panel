@@ -105,7 +105,7 @@ function paneUsers() {
     <div class="box"><table><thead><tr>${[["name", "المستخدم"], ["work", "الشركة أو الوظيفة"], ["os", "الجهاز"], ["panel_version", "البانل"], ["claude_version", "Claude Code"],
       ["last_seen", "آخر ظهور"], ["first_seen", "أول ظهور"], ["opens", "فتح"], ["messages", "رسائل"], ["tool_runs", "أدوات"]]
       .map(([key, l]) => `<th data-k="${key}">${l}${S.sortKey === key ? (S.sortDir < 0 ? " ↓" : " ↑") : ""}</th>`).join("")}</tr></thead><tbody id="tb"></tbody></table></div>
-    <p class="sub">اضغط على أي مستخدم لإيقافه، أو إعطائه صلاحيات، أو مراسلته، أو رؤية نشاطه.</p>`;
+    <p class="sub">النقطة الخضراء: البانل مفتوح عنده الآن (آخر 15 دقيقة). اضغط على أي مستخدم لإيقافه، أو إعطائه صلاحيات، أو مراسلته، أو رؤية نشاطه.</p>`;
   document.querySelectorAll("th").forEach((th) => th.onclick = () => { S.sortDir = S.sortKey === th.dataset.k ? -S.sortDir : -1; S.sortKey = th.dataset.k; paneUsers(); });
   $("#q").oninput = body; $("#csv").onclick = csv; body();
 }
@@ -115,7 +115,7 @@ function body() {
     const x = a[S.sortKey], y = b[S.sortKey]; if (/version/.test(S.sortKey)) return S.sortDir * vcmp(x, y);
     if (typeof x === "number" || typeof y === "number") return S.sortDir * ((x || 0) - (y || 0)); return S.sortDir * String(x || "").localeCompare(String(y || ""), "ar"); });
   $("#tb").innerHTML = list.length ? list.map((r) => { const a = A[r.id] || {};
-    return `<tr data-id="${r.id}"><td class="who"><b><span class="dot${now - new Date(r.last_seen) < 3.5 * 36e5 ? " on" : ""}"></span>${esc(r.name || "بدون اسم")}
+    return `<tr data-id="${r.id}"><td class="who"><b><span class="dot${now - new Date(r.last_seen) < 15 * 6e4 ? " on" : ""}"></span>${esc(r.name || "بدون اسم")}
       ${a.blocked ? '<span class="tag bad ar">موقوف</span>' : ""}${a.owner ? '<span class="tag ok ar">صلاحيات كاملة</span>' : ""}${a.beta ? '<span class="tag warn ar">تجريبي</span>' : ""}${a.tag ? `<span class="tag ar">${esc(a.tag)}</span>` : ""}</b><small>${esc(r.email || "")}</small></td>
     <td>${esc(r.work || "—")}</td><td title="${esc(r.os)} · ${esc(r.machine)}">${esc(osName(r.os))}</td>
     <td><span class="tag${S.latest && r.panel_version && vcmp(r.panel_version, S.latest) < 0 ? " old" : ""}">${esc(r.panel_version || "—")}</span></td>
