@@ -62,7 +62,7 @@ const vnum = (v) => String(v || "0").split(".").map(Number), vcmp = (a, b) => { 
 const osName = (o) => /^win|windows/i.test(o) ? "Windows" : /darwin|mac/i.test(o) ? "Mac" : (o || "—");
 const toast = (t) => { const d = document.createElement("div"); d.className = "toast"; d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), 2600); };
 const name = (id) => (S.users.find((u) => u.id === id) || {}).name || "مستخدم محذوف";
-const KIND = { open: "فتح البانل", chat: "رسالة لـ Claude", tool: "أداة", route: "أمر سريع", error: "خطأ", test: "اختبار" };
+const KIND = { beta_request: "طلب التحديثات التجريبية", beta_cancel: "ألغى طلب التجريبي", open: "فتح البانل", chat: "رسالة لـ Claude", tool: "أداة", route: "أمر سريع", error: "خطأ", test: "اختبار" };
 
 function gate(msg, err) {
   $("#app").innerHTML = `<div class="gate"><div class="logo" style="margin:0 auto 14px">✳</div><h1 style="flex:none">لوحة Claude Panel</h1>
@@ -95,12 +95,14 @@ function render() {
   ({ users: paneUsers, reports: paneReports, stats: paneStats, messages: paneMessages, settings: paneSettings })[S.tab]();
 }
 // ---------- users ----------
+// a user asked for early updates in the panel (event beta_request, latest of request/cancel) and is not on beta yet
+const betaReq = (id) => { const e = S.events.find((x) => x.user_id === id && (x.kind === "beta_request" || x.kind === "beta_cancel")); return !!e && e.kind === "beta_request" && !(S.admin[id] || {}).beta; };
 function paneUsers() {
   const now = Date.now(), d = (r) => now - new Date(r.last_seen);
   const k = { all: S.users.length, day: S.users.filter((r) => d(r) < 864e5).length, week: S.users.filter((r) => d(r) < 7 * 864e5).length,
-    old: S.users.filter((r) => S.latest && r.panel_version && vcmp(r.panel_version, S.latest) < 0).length };
+    old: S.users.filter((r) => S.latest && r.panel_version && vcmp(r.panel_version, S.latest) < 0).length, beta: S.users.filter((r) => betaReq(r.id)).length };
   $("#pane").innerHTML = `<div class="kpis"><div class="kpi"><b>${k.all}</b><span>كل المستخدمين</span></div><div class="kpi"><b>${k.day}</b><span>نشط آخر 24 ساعة</span></div>
-      <div class="kpi"><b>${k.week}</b><span>نشط آخر 7 أيام</span></div><div class="kpi"><b>${k.old}</b><span>على نسخة قديمة${S.latest ? " (الأحدث " + esc(S.latest) + ")" : ""}</span></div></div>
+      <div class="kpi"><b>${k.week}</b><span>نشط آخر 7 أيام</span></div><div class="kpi"><b>${k.old}</b><span>على نسخة قديمة${S.latest ? " (الأحدث " + esc(S.latest) + ")" : ""}</span></div>${k.beta ? `<div class="kpi"><b>${k.beta}</b><span>طلبات التحديثات التجريبية</span></div>` : ""}</div>
     <div class="tools"><input id="q" placeholder="ابحث بالاسم أو الإيميل أو الشركة أو التصنيف…"><button id="csv">تصدير Excel</button></div>
     <div class="box"><table><thead><tr>${[["name", "المستخدم"], ["work", "الشركة أو الوظيفة"], ["os", "الجهاز"], ["panel_version", "البانل"], ["claude_version", "Claude Code"],
       ["last_seen", "آخر ظهور"], ["first_seen", "أول ظهور"], ["opens", "فتح"], ["messages", "رسائل"], ["tool_runs", "أدوات"]]
@@ -116,7 +118,7 @@ function body() {
     if (typeof x === "number" || typeof y === "number") return S.sortDir * ((x || 0) - (y || 0)); return S.sortDir * String(x || "").localeCompare(String(y || ""), "ar"); });
   $("#tb").innerHTML = list.length ? list.map((r) => { const a = A[r.id] || {};
     return `<tr data-id="${r.id}"><td class="who"><b><span class="dot${now - new Date(r.last_seen) < 15 * 6e4 ? " on" : ""}"></span>${esc(r.name || "بدون اسم")}
-      ${a.blocked ? '<span class="tag bad ar">موقوف</span>' : ""}${a.owner ? '<span class="tag ok ar">صلاحيات كاملة</span>' : ""}${a.beta ? '<span class="tag warn ar">تجريبي</span>' : ""}${a.tag ? `<span class="tag ar">${esc(a.tag)}</span>` : ""}</b><small>${esc(r.email || "")}</small></td>
+      ${a.blocked ? '<span class="tag bad ar">موقوف</span>' : ""}${a.owner ? '<span class="tag ok ar">صلاحيات كاملة</span>' : ""}${a.beta ? '<span class="tag warn ar">تجريبي</span>' : ""}${betaReq(r.id) ? '<span class="tag warn ar">طلب التجريبي</span>' : ""}${a.tag ? `<span class="tag ar">${esc(a.tag)}</span>` : ""}</b><small>${esc(r.email || "")}</small></td>
     <td>${esc(r.work || "—")}</td><td title="${esc(r.os)} · ${esc(r.machine)}">${esc(osName(r.os))}</td>
     <td><span class="tag${S.latest && r.panel_version && vcmp(r.panel_version, S.latest) < 0 ? " old" : ""}">${esc(r.panel_version || "—")}</span></td>
     <td><span class="tag">${esc(r.claude_version || "—")}</span></td><td>${ago(r.last_seen)}</td><td>${new Date(r.first_seen).toLocaleDateString("ar-EG")}</td>
@@ -148,7 +150,7 @@ function drawer(id) {
     <h2>الصلاحيات</h2>
     <div class="row"><span>${a.blocked ? "البانل متوقف عنده" : "إيقاف البانل عنده"}</span><button id="bl" class="${a.blocked ? "primary" : "danger"}">${a.blocked ? "إعادة التشغيل" : "إيقاف"}</button></div>
     <textarea id="bm" placeholder="الرسالة التي يراها عند الإيقاف (اختياري)">${esc(a.block_msg || "")}</textarea>
-    <div class="row"><span>التحديثات التجريبية</span><button id="be">${a.beta ? "مفعل · إلغاء" : "تفعيل"}</button></div>
+    <div class="row"><span>التحديثات التجريبية</span><button id="be">${a.beta ? "مفعل · إلغاء" : betaReq(id) ? "طلب التفعيل · فعّل" : "تفعيل"}</button></div>
     <div class="row"><span>صلاحيات كاملة (يعمل Claude دون أن يسأل)</span><button id="ow">${a.owner ? "مفعل · إلغاء" : "تفعيل"}</button></div>
     <h2>ملاحظات</h2><input id="tg" placeholder="تصنيف قصير (مثلا: فريق Meena)" value="${esc(a.tag || "")}" style="width:100%;margin-bottom:8px">
     <textarea id="nt" placeholder="ملاحظة لا يراها غيرك">${esc(a.note || "")}</textarea><div style="margin-top:8px"><button class="primary" id="sv">حفظ</button></div>
