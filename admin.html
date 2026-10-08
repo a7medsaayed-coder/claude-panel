@@ -1,94 +1,231 @@
 <!doctype html>
 <html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
-<title>مستخدمو Claude Panel</title>
+<title>لوحة Claude Panel</title>
 <style>
-:root{--bg:#1f1e1d;--card:#2a2826;--card2:#33302d;--ink:#f3eee8;--ink2:#b9b2a9;--ink3:#857f78;--clay:#d97757;--ok:#5fb37a;--warn:#e0a93b;--line:#3a3734}
+:root{--bg:#1f1e1d;--card:#2a2826;--card2:#33302d;--ink:#f3eee8;--ink2:#b9b2a9;--ink3:#857f78;--clay:#d97757;--ok:#5fb37a;--warn:#e0a93b;--bad:#e5675c;--line:#3a3734}
 @media (prefers-color-scheme:light){:root{--bg:#faf8f5;--card:#fff;--card2:#f4f0ea;--ink:#1f1e1d;--ink2:#5e5a55;--ink3:#8d877f;--line:#e6e1da}}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 "IBM Plex Sans Arabic","Segoe UI",system-ui,sans-serif}
-main{max-width:1180px;margin:0 auto;padding:28px 16px 64px}
-header{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:22px}
-.logo{width:38px;height:38px;border-radius:11px;background:var(--clay);display:grid;place-items:center;color:#fff;font-size:20px;flex:none}
-h1{font-size:22px;margin:0;flex:1}.me{color:var(--ink3);font-size:13px}
-button{font:inherit;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:8px 14px;cursor:pointer}
-button.primary{background:var(--clay);border-color:var(--clay);color:#fff}
-.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
-.kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
-.kpi b{display:block;font-size:26px;font-variant-numeric:tabular-nums}.kpi span{color:var(--ink2);font-size:13px}
-.tools{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
-input{font:inherit;flex:1;min-width:200px;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:9px 12px}
-.tbl{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:auto}
+main{max-width:1180px;margin:0 auto;padding:24px 16px 64px}
+header{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.logo{width:36px;height:36px;border-radius:10px;background:var(--clay);display:grid;place-items:center;color:#fff;font-size:19px;flex:none}
+h1{font-size:21px;margin:0;flex:1}.me{color:var(--ink3);font-size:13px}h2{font-size:16px;margin:18px 0 10px}
+button,select{font:inherit;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:7px 13px;cursor:pointer}
+button.primary{background:var(--clay);border-color:var(--clay);color:#fff}button.danger{color:var(--bad);border-color:rgba(229,103,92,.5)}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;border-bottom:1px solid var(--line);padding-bottom:10px}
+.tabs button{border-radius:20px}.tabs button.on{background:var(--clay);border-color:var(--clay);color:#fff}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 15px}
+.kpi b{display:block;font-size:25px;font-variant-numeric:tabular-nums}.kpi span{color:var(--ink2);font-size:13px}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
+input,textarea{font:inherit;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:8px 11px}
+.tools input{flex:1;min-width:200px}textarea{width:100%;min-height:76px;resize:vertical}
+.box{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:auto}
 table{width:100%;border-collapse:collapse;min-width:860px}
-th,td{padding:11px 12px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+th,td{padding:10px 12px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
 th{font-size:12.5px;color:var(--ink3);font-weight:600;cursor:pointer;user-select:none;background:var(--card2);position:sticky;top:0}
-tr:last-child td{border-bottom:0}td.n{font-variant-numeric:tabular-nums;text-align:center}
+tbody tr{cursor:pointer}tbody tr:hover{background:var(--card2)}tr:last-child td{border-bottom:0}td.n{font-variant-numeric:tabular-nums;text-align:center}
 .who b{display:block}.who small{color:var(--ink3);direction:ltr;display:block;text-align:right}
 .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-inline-end:6px;background:var(--ink3)}.dot.on{background:var(--ok)}
-.tag{display:inline-block;padding:1px 8px;border-radius:20px;font-size:12px;background:var(--card2);direction:ltr}.tag.old{background:rgba(224,169,59,.18);color:var(--warn)}
+.tag{display:inline-block;padding:1px 8px;border-radius:20px;font-size:12px;background:var(--card2);direction:ltr;margin-inline-start:4px;color:var(--ink2);text-decoration:none}
+.tag.old,.tag.warn{background:rgba(224,169,59,.18);color:var(--warn)}.tag.bad{background:rgba(229,103,92,.16);color:var(--bad)}.tag.ok{background:rgba(95,179,122,.16);color:var(--ok)}
+.tag.ar{direction:rtl}
 .gate{max-width:420px;margin:12vh auto;text-align:center;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:32px 24px}
-.gate p{color:var(--ink2)}.err{color:#ff9a8f}.empty{padding:28px;text-align:center;color:var(--ink2)}
-@media (max-width:720px){.kpis{grid-template-columns:repeat(2,1fr)}h1{font-size:19px}}
+.gate p{color:var(--ink2)}.err{color:var(--bad)}.empty{padding:26px;text-align:center;color:var(--ink2)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:10px}
+.card .t{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.card .t b{flex:1}.card p{margin:6px 0;color:var(--ink2);white-space:pre-wrap}
+.sub{color:var(--ink3);font-size:12.5px}
+.drawer{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;justify-content:flex-start;z-index:9}
+.drawer .in{width:min(520px,100%);height:100%;overflow:auto;background:var(--bg);border-inline-end:1px solid var(--line);padding:20px 18px}
+.row{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line)}
+.row span{color:var(--ink2)}
+.bars{display:flex;align-items:flex-end;gap:4px;height:150px;padding:18px 6px 0;border-bottom:1px solid var(--line);direction:ltr}
+.bars div{flex:1;background:var(--clay);border-radius:5px 5px 0 0;min-height:2px;position:relative}
+.bars div i{position:absolute;top:-18px;left:0;right:0;text-align:center;font-style:normal;font-size:11px;color:var(--ink2)}
+.blab{display:flex;gap:4px;direction:ltr;padding:4px 6px 0}.blab span{flex:1;text-align:center;font-size:10.5px;color:var(--ink3)}
+.meter{height:8px;border-radius:5px;background:var(--card2);overflow:hidden;flex:1;min-width:80px}.meter i{display:block;height:100%;background:var(--clay)}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:9px 16px;z-index:10}
+@media (max-width:720px){.kpis{grid-template-columns:repeat(2,1fr)}h1{font-size:18px}}
 </style></head>
 <body><main id="app"><div class="gate"><p>جار التحميل…</p></div></main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script>
-// Users of the Claude panel (2026-10-08). Data: Supabase table panel_users. Only the developer's Google account can read every row
-// (row-level security policy "admin read all"); anyone else who opens this page sees nothing.
+// The developer's dashboard for the Claude panel (2026-10-08). Supabase tables panel_users / panel_admin / panel_messages / panel_config /
+// panel_events / panel_reports; only the developer's Google account can read everyone or change anything (row-level security, admin.sql).
 const ADMIN = "a7medsaayed@gmail.com", URL_ = "https://vfwszdgbylmvywksddiu.supabase.co", KEY = "sb_publishable_htxZZdv0xjAF5icUCEuMMQ_0Nz8XVsa";
 const sb = supabase.createClient(URL_, KEY, { auth: { flowType: "pkce", detectSessionInUrl: true, persistSession: true } });
 const $ = (s) => document.querySelector(s), esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
-let rows = [], sortKey = "last_seen", sortDir = -1, latest = "";
+const S = { tab: "users", users: [], admin: {}, reports: [], messages: [], config: {}, events: [], sortKey: "last_seen", sortDir: -1, latest: "", me: "" };
 const ago = (t) => { if (!t) return "—"; const m = Math.round((Date.now() - new Date(t)) / 60000);
   return m < 1 ? "الآن" : m < 60 ? "منذ " + m + " د" : m < 1440 ? "منذ " + Math.round(m / 60) + " س" : m < 43200 ? "منذ " + Math.round(m / 1440) + " يوم" : new Date(t).toLocaleDateString("ar-EG"); };
 const vnum = (v) => String(v || "0").split(".").map(Number), vcmp = (a, b) => { a = vnum(a); b = vnum(b); for (let i = 0; i < 3; i++) if ((a[i] || 0) !== (b[i] || 0)) return (a[i] || 0) - (b[i] || 0); return 0; };
 const osName = (o) => /^win|windows/i.test(o) ? "Windows" : /darwin|mac/i.test(o) ? "Mac" : (o || "—");
+const toast = (t) => { const d = document.createElement("div"); d.className = "toast"; d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), 2600); };
+const name = (id) => (S.users.find((u) => u.id === id) || {}).name || "مستخدم محذوف";
+const KIND = { open: "فتح البانل", chat: "رسالة لـ Claude", tool: "أداة", route: "أمر سريع", error: "خطأ", test: "اختبار" };
 
 function gate(msg, err) {
-  $("#app").innerHTML = `<div class="gate"><div class="logo" style="margin:0 auto 14px">✳</div><h1 style="flex:none">مستخدمو Claude Panel</h1>
+  $("#app").innerHTML = `<div class="gate"><div class="logo" style="margin:0 auto 14px">✳</div><h1 style="flex:none">لوحة Claude Panel</h1>
     <p>${msg}</p>${err ? `<p class="err">${esc(err)}</p>` : ""}<button class="primary" id="in">الدخول بحساب Google</button></div>`;
   $("#in").onclick = () => sb.auth.signInWithOAuth({ provider: "google", options: { redirectTo: location.origin + location.pathname } });
 }
+async function q(p) { const r = await p; if (r.error) throw new Error(r.error.message); return r.data; }
 async function load() {
   const { data: { session } } = await sb.auth.getSession();
   if (!session) return gate("هذه اللوحة للمطور فقط.");
-  const { data, error } = await sb.from("panel_users").select("*").order("last_seen", { ascending: false });
-  if (error) return gate("تعذر قراءة المستخدمين.", error.message);
-  // the page only shows; the database decides (policy "admin read all"): any other account gets its own row at most
   if (session.user.email !== ADMIN) { await sb.auth.signOut(); return gate("هذا الحساب (" + esc(session.user.email) + ") ليس حساب المطور."); }
-  rows = data || [];
-  latest = rows.map((r) => r.panel_version).filter((v) => /^\d+\.\d+\.\d+$/.test(v || "")).sort(vcmp).pop() || "";
-  render(session.user.email);
+  S.me = session.user.email;
+  try {
+    const since = new Date(Date.now() - 30 * 864e5).toISOString();
+    const [u, a, r, m, c, e] = await Promise.all([q(sb.from("panel_users").select("*")), q(sb.from("panel_admin").select("*")),
+      q(sb.from("panel_reports").select("*").order("created_at", { ascending: false }).limit(300)), q(sb.from("panel_messages").select("*").order("created_at", { ascending: false }).limit(100)),
+      q(sb.from("panel_config").select("*")), q(sb.from("panel_events").select("id,user_id,at,kind,tool,ok,ms,detail").gte("at", since).order("at", { ascending: false }).limit(20000))]);
+    S.users = u; S.admin = {}; a.forEach((x) => (S.admin[x.user_id] = x)); S.reports = r; S.messages = m; S.config = {}; c.forEach((x) => (S.config[x.key] = x.value)); S.events = e;
+  } catch (er) { return gate("تعذر قراءة البيانات.", er.message); }
+  S.latest = S.users.map((r) => r.panel_version).filter((v) => /^\d+\.\d+\.\d+$/.test(v || "")).sort(vcmp).pop() || "";
+  render();
 }
-function render(me) {
+function render() {
+  const open = S.reports.filter((r) => r.status === "open").length;
+  const tabs = [["users", "المستخدمون"], ["reports", "البلاغات" + (open ? " (" + open + ")" : "")], ["stats", "الإحصائيات"], ["messages", "الرسائل"], ["settings", "الإعدادات"]];
+  $("#app").innerHTML = `<header><div class="logo">✳</div><h1>لوحة Claude Panel</h1><span class="me">${esc(S.me)}</span><button id="re">تحديث</button><button id="out">خروج</button></header>
+    <div class="tabs">${tabs.map(([k, l]) => `<button data-t="${k}" class="${S.tab === k ? "on" : ""}">${l}</button>`).join("")}</div><div id="pane"></div>`;
+  $("#re").onclick = load; $("#out").onclick = async () => { await sb.auth.signOut(); S.me = ""; gate("خرجت من اللوحة."); };
+  document.querySelectorAll(".tabs button").forEach((b) => b.onclick = () => { S.tab = b.dataset.t; render(); });
+  ({ users: paneUsers, reports: paneReports, stats: paneStats, messages: paneMessages, settings: paneSettings })[S.tab]();
+}
+// ---------- users ----------
+function paneUsers() {
   const now = Date.now(), d = (r) => now - new Date(r.last_seen);
-  const k = { all: rows.length, day: rows.filter((r) => d(r) < 864e5).length, week: rows.filter((r) => d(r) < 7 * 864e5).length,
-    old: rows.filter((r) => latest && r.panel_version && vcmp(r.panel_version, latest) < 0).length };
-  $("#app").innerHTML = `<header><div class="logo">✳</div><h1>مستخدمو Claude Panel</h1><span class="me">${esc(me)}</span>
-      <button id="re">تحديث</button><button id="out">خروج</button></header>
-    <div class="kpis"><div class="kpi"><b>${k.all}</b><span>كل المستخدمين</span></div><div class="kpi"><b>${k.day}</b><span>نشط آخر 24 ساعة</span></div>
-      <div class="kpi"><b>${k.week}</b><span>نشط آخر 7 أيام</span></div><div class="kpi"><b>${k.old}</b><span>على نسخة قديمة${latest ? " (الأحدث " + esc(latest) + ")" : ""}</span></div></div>
-    <div class="tools"><input id="q" placeholder="ابحث بالاسم أو الإيميل أو الشركة…"></div>
-    <div class="tbl"><table><thead><tr>${[["name", "المستخدم"], ["work", "الشركة أو الوظيفة"], ["os", "الجهاز"], ["panel_version", "البانل"], ["claude_version", "Claude Code"],
-      ["premiere_version", "Premiere"], ["last_seen", "آخر ظهور"], ["first_seen", "أول ظهور"], ["opens", "مرات الفتح"], ["messages", "رسائل"], ["tool_runs", "أدوات"]]
-      .map(([key, l]) => `<th data-k="${key}">${l}${sortKey === key ? (sortDir < 0 ? " ↓" : " ↑") : ""}</th>`).join("")}</tr></thead><tbody id="tb"></tbody></table></div>`;
-  $("#re").onclick = load; $("#out").onclick = async () => { await sb.auth.signOut(); gate("خرجت من اللوحة."); };
-  document.querySelectorAll("th").forEach((th) => th.onclick = () => { sortDir = sortKey === th.dataset.k ? -sortDir : -1; sortKey = th.dataset.k; render(me); });
-  $("#q").oninput = body; body();
+  const k = { all: S.users.length, day: S.users.filter((r) => d(r) < 864e5).length, week: S.users.filter((r) => d(r) < 7 * 864e5).length,
+    old: S.users.filter((r) => S.latest && r.panel_version && vcmp(r.panel_version, S.latest) < 0).length };
+  $("#pane").innerHTML = `<div class="kpis"><div class="kpi"><b>${k.all}</b><span>كل المستخدمين</span></div><div class="kpi"><b>${k.day}</b><span>نشط آخر 24 ساعة</span></div>
+      <div class="kpi"><b>${k.week}</b><span>نشط آخر 7 أيام</span></div><div class="kpi"><b>${k.old}</b><span>على نسخة قديمة${S.latest ? " (الأحدث " + esc(S.latest) + ")" : ""}</span></div></div>
+    <div class="tools"><input id="q" placeholder="ابحث بالاسم أو الإيميل أو الشركة أو التصنيف…"><button id="csv">تصدير Excel</button></div>
+    <div class="box"><table><thead><tr>${[["name", "المستخدم"], ["work", "الشركة أو الوظيفة"], ["os", "الجهاز"], ["panel_version", "البانل"], ["claude_version", "Claude Code"],
+      ["last_seen", "آخر ظهور"], ["first_seen", "أول ظهور"], ["opens", "فتح"], ["messages", "رسائل"], ["tool_runs", "أدوات"]]
+      .map(([key, l]) => `<th data-k="${key}">${l}${S.sortKey === key ? (S.sortDir < 0 ? " ↓" : " ↑") : ""}</th>`).join("")}</tr></thead><tbody id="tb"></tbody></table></div>
+    <p class="sub">اضغط على أي مستخدم لإيقافه، أو إعطائه صلاحيات، أو مراسلته، أو رؤية نشاطه.</p>`;
+  document.querySelectorAll("th").forEach((th) => th.onclick = () => { S.sortDir = S.sortKey === th.dataset.k ? -S.sortDir : -1; S.sortKey = th.dataset.k; paneUsers(); });
+  $("#q").oninput = body; $("#csv").onclick = csv; body();
 }
 function body() {
-  const q = ($("#q").value || "").trim().toLowerCase(), now = Date.now();
-  const list = rows.filter((r) => !q || [r.name, r.email, r.work, r.machine].join(" ").toLowerCase().includes(q)).sort((a, b) => {
-    let x = a[sortKey], y = b[sortKey]; if (/version/.test(sortKey)) return sortDir * vcmp(x, y);
-    if (typeof x === "number" || typeof y === "number") return sortDir * ((x || 0) - (y || 0)); return sortDir * String(x || "").localeCompare(String(y || ""), "ar"); });
-  $("#tb").innerHTML = list.length ? list.map((r) => `<tr>
-    <td class="who"><b><span class="dot${now - new Date(r.last_seen) < 3.5 * 36e5 ? " on" : ""}"></span>${esc(r.name || "بدون اسم")}</b><small>${esc(r.email || "")}</small></td>
+  const qq = ($("#q").value || "").trim().toLowerCase(), now = Date.now(), A = S.admin;
+  const list = S.users.filter((r) => !qq || [r.name, r.email, r.work, r.machine, (A[r.id] || {}).tag, (A[r.id] || {}).note].join(" ").toLowerCase().includes(qq)).sort((a, b) => {
+    const x = a[S.sortKey], y = b[S.sortKey]; if (/version/.test(S.sortKey)) return S.sortDir * vcmp(x, y);
+    if (typeof x === "number" || typeof y === "number") return S.sortDir * ((x || 0) - (y || 0)); return S.sortDir * String(x || "").localeCompare(String(y || ""), "ar"); });
+  $("#tb").innerHTML = list.length ? list.map((r) => { const a = A[r.id] || {};
+    return `<tr data-id="${r.id}"><td class="who"><b><span class="dot${now - new Date(r.last_seen) < 3.5 * 36e5 ? " on" : ""}"></span>${esc(r.name || "بدون اسم")}
+      ${a.blocked ? '<span class="tag bad ar">موقوف</span>' : ""}${a.owner ? '<span class="tag ok ar">صلاحيات كاملة</span>' : ""}${a.beta ? '<span class="tag warn ar">تجريبي</span>' : ""}${a.tag ? `<span class="tag ar">${esc(a.tag)}</span>` : ""}</b><small>${esc(r.email || "")}</small></td>
     <td>${esc(r.work || "—")}</td><td title="${esc(r.os)} · ${esc(r.machine)}">${esc(osName(r.os))}</td>
-    <td><span class="tag${latest && r.panel_version && vcmp(r.panel_version, latest) < 0 ? " old" : ""}">${esc(r.panel_version || "—")}</span></td>
-    <td><span class="tag">${esc(r.claude_version || "—")}</span></td><td><span class="tag">${esc(r.premiere_version || "—")}</span></td>
-    <td title="${esc(r.last_seen)}">${ago(r.last_seen)}</td><td title="${esc(r.first_seen)}">${new Date(r.first_seen).toLocaleDateString("ar-EG")}</td>
-    <td class="n">${r.opens || 0}</td><td class="n">${r.messages || 0}</td><td class="n">${r.tool_runs || 0}</td></tr>`).join("")
-    : `<tr><td colspan="11" class="empty">${q ? "لا يوجد مستخدم بهذا البحث." : "لا يوجد مستخدمون بعد."}</td></tr>`;
+    <td><span class="tag${S.latest && r.panel_version && vcmp(r.panel_version, S.latest) < 0 ? " old" : ""}">${esc(r.panel_version || "—")}</span></td>
+    <td><span class="tag">${esc(r.claude_version || "—")}</span></td><td>${ago(r.last_seen)}</td><td>${new Date(r.first_seen).toLocaleDateString("ar-EG")}</td>
+    <td class="n">${r.opens || 0}</td><td class="n">${r.messages || 0}</td><td class="n">${r.tool_runs || 0}</td></tr>`; }).join("")
+    : `<tr><td colspan="10" class="empty">${qq ? "لا يوجد مستخدم بهذا البحث." : "لا يوجد مستخدمون بعد."}</td></tr>`;
+  document.querySelectorAll("#tb tr[data-id]").forEach((tr) => tr.onclick = () => drawer(tr.dataset.id));
 }
-sb.auth.onAuthStateChange((ev) => { if (ev === "SIGNED_IN") load(); });
+function csv() {
+  const cols = ["name", "email", "work", "os", "machine", "panel_version", "claude_version", "premiere_version", "first_seen", "last_seen", "opens", "messages", "tool_runs"];
+  const rows = [cols.concat(["blocked", "beta", "owner", "tag", "note"]).join(",")].concat(S.users.map((u) => { const a = S.admin[u.id] || {};
+    return cols.map((c) => u[c]).concat([a.blocked, a.beta, a.owner, a.tag, a.note]).map((v) => '"' + String(v == null ? "" : v).replace(/"/g, '""') + '"').join(","); }));
+  const blob = new Blob(["﻿" + rows.join("\n")], { type: "text/csv;charset=utf-8" }), l = document.createElement("a");
+  l.href = URL.createObjectURL(blob); l.download = "claude-panel-users-" + new Date().toISOString().slice(0, 10) + ".csv"; l.click();
+}
+async function setAdmin(id, v) {
+  const r = await sb.from("panel_admin").upsert(Object.assign({ user_id: id, updated_at: new Date().toISOString() }, v));
+  if (r.error) { toast("تعذر الحفظ: " + r.error.message); return false; }
+  S.admin[id] = Object.assign({}, S.admin[id] || { user_id: id }, v); return true;
+}
+function drawer(id) {
+  const u = S.users.find((x) => x.id === id), a = S.admin[id] || {}, ev = S.events.filter((e) => e.user_id === id).slice(0, 60), rep = S.reports.filter((r) => r.user_id === id);
+  const d = document.createElement("div"); d.className = "drawer";
+  d.innerHTML = `<div class="in"><div style="display:flex;align-items:center;gap:10px"><h2 style="flex:1;margin:0">${esc(u.name || "بدون اسم")}</h2><button id="dx">إغلاق</button></div>
+    <p class="sub" style="direction:ltr;text-align:right">${esc(u.email || "")}</p>
+    <div class="row"><span>الشركة أو الوظيفة</span><b>${esc(u.work || "—")}</b></div>
+    <div class="row"><span>الجهاز</span><b>${esc(osName(u.os))} · ${esc(u.machine || "")}</b></div>
+    <div class="row"><span>البانل / Claude Code / Premiere</span><b>${esc(u.panel_version || "—")} · ${esc(u.claude_version || "—")} · ${esc(u.premiere_version || "—")}</b></div>
+    <div class="row"><span>أول وآخر ظهور</span><b>${new Date(u.first_seen).toLocaleDateString("ar-EG")} · ${ago(u.last_seen)}</b></div>
+    <h2>الصلاحيات</h2>
+    <div class="row"><span>${a.blocked ? "البانل متوقف عنده" : "إيقاف البانل عنده"}</span><button id="bl" class="${a.blocked ? "primary" : "danger"}">${a.blocked ? "إعادة التشغيل" : "إيقاف"}</button></div>
+    <textarea id="bm" placeholder="الرسالة التي يراها عند الإيقاف (اختياري)">${esc(a.block_msg || "")}</textarea>
+    <div class="row"><span>التحديثات التجريبية</span><button id="be">${a.beta ? "مفعل · إلغاء" : "تفعيل"}</button></div>
+    <div class="row"><span>صلاحيات كاملة (يعمل Claude دون أن يسأل)</span><button id="ow">${a.owner ? "مفعل · إلغاء" : "تفعيل"}</button></div>
+    <h2>ملاحظات</h2><input id="tg" placeholder="تصنيف قصير (مثلا: فريق Meena)" value="${esc(a.tag || "")}" style="width:100%;margin-bottom:8px">
+    <textarea id="nt" placeholder="ملاحظة لا يراها غيرك">${esc(a.note || "")}</textarea><div style="margin-top:8px"><button class="primary" id="sv">حفظ</button></div>
+    <h2>رسالة له</h2><textarea id="pm" placeholder="تظهر له في البانل"></textarea><div style="margin-top:8px"><button id="sm">إرسال</button></div>
+    <h2>البلاغات (${rep.length})</h2>${rep.map((r) => `<div class="card"><div class="t"><b>${esc(r.title || "")}</b><span class="tag ${r.status === "open" ? "warn" : "ok"} ar">${r.status === "open" ? "مفتوح" : "تم الحل"}</span></div><p class="sub">${ago(r.created_at)}</p></div>`).join("") || '<p class="sub">لا توجد بلاغات.</p>'}
+    <h2>النشاط (آخر 30 يوما)</h2>${ev.map((e) => `<div class="row"><span>${ago(e.at)}</span><b>${esc(KIND[e.kind] || e.kind)}${e.tool ? " · " + esc(e.tool) : ""}${e.ok === false ? ' <span class="tag bad ar">فشل</span>' : ""}${e.ms ? ' <span class="sub">' + (e.ms / 1000).toFixed(1) + " ث</span>" : ""}${e.detail ? '<br><span class="sub">' + esc(e.detail) + "</span>" : ""}</b></div>`).join("") || '<p class="sub">لا يوجد نشاط مسجل بعد.</p>'}
+    <h2>حذف البيانات</h2><p class="sub">عند طلب المستخدم: يحذف بياناته ونشاطه وبلاغاته. حسابه في Authentication يحذف من Supabase نفسه.</p><button class="danger" id="fg">حذف بيانات هذا المستخدم</button></div>`;
+  document.body.appendChild(d);
+  const close = () => { d.remove(); render(); };
+  d.onclick = (e) => { if (e.target === d) close(); }; d.querySelector("#dx").onclick = close;
+  d.querySelector("#bl").onclick = async () => { if (await setAdmin(id, { blocked: !a.blocked, block_msg: d.querySelector("#bm").value.trim() || null })) { toast(a.blocked ? "أعيد تشغيل البانل عنده" : "يتوقف البانل عنده خلال 10 دقائق"); d.remove(); drawer(id); } };
+  d.querySelector("#be").onclick = async () => { if (await setAdmin(id, { beta: !a.beta })) { d.remove(); drawer(id); } };
+  d.querySelector("#ow").onclick = async () => { if (await setAdmin(id, { owner: !a.owner })) { d.remove(); drawer(id); } };
+  d.querySelector("#sv").onclick = async () => { if (await setAdmin(id, { note: d.querySelector("#nt").value.trim() || null, tag: d.querySelector("#tg").value.trim() || null })) toast("تم الحفظ"); };
+  d.querySelector("#sm").onclick = async () => { const t = d.querySelector("#pm").value.trim(); if (!t) return; const r = await sb.from("panel_messages").insert({ target: id, text: t }).select();
+    if (r.error) return toast(r.error.message); S.messages.unshift(r.data[0]); d.querySelector("#pm").value = ""; toast("أرسلت، تظهر له خلال 10 دقائق"); };
+  d.querySelector("#fg").onclick = async () => { if (!confirm("حذف كل بيانات " + (u.name || "") + "؟ لا يمكن التراجع.")) return;
+    for (const [t, c] of [["panel_events", "user_id"], ["panel_reports", "user_id"], ["panel_messages", "target"], ["panel_admin", "user_id"], ["panel_users", "id"]]) { const r = await sb.from(t).delete().eq(c, id); if (r.error) return toast(t + ": " + r.error.message); }
+    toast("حذفت البيانات"); d.remove(); load(); };
+}
+// ---------- reports ----------
+function paneReports() {
+  const f = S.repFilter || "open", list = S.reports.filter((r) => f === "all" || r.status === f);
+  $("#pane").innerHTML = `<div class="tools"><select id="rf"><option value="open">المفتوحة</option><option value="done">تم حلها</option><option value="all">الكل</option></select>
+    <span class="sub">كل بلاغ موجود أيضا على GitHub. الرد هنا يظهر لصاحبه في البانل.</span></div>
+    ${list.map((r) => `<div class="card"><div class="t"><b>${esc(r.title || "")}</b><span class="tag ${r.status === "open" ? "warn" : "ok"} ar">${r.status === "open" ? "مفتوح" : "تم الحل"}</span>
+      ${r.github ? `<a class="tag" target="_blank" href="https://github.com/a7medsaayed-coder/claude-panel-reports/issues/${r.github}">GitHub #${r.github}</a>` : ""}</div>
+      <p class="sub">${esc(name(r.user_id))} · ${ago(r.created_at)}</p><p>${esc(r.text || "")}</p>
+      ${r.details ? `<details><summary class="sub">تفاصيل الجهاز والسجل</summary><pre style="white-space:pre-wrap;direction:ltr;text-align:left;font-size:12px">${esc(r.details)}</pre></details>` : ""}
+      ${r.reply ? `<p><b>ردك:</b> ${esc(r.reply)}</p>` : ""}
+      ${r.status === "open" ? `<textarea data-r="${r.id}" placeholder="ردك (يظهر له في البانل)"></textarea><div style="margin-top:8px"><button class="primary" data-done="${r.id}">تم الحل وإرسال الرد</button></div>`
+        : `<button data-open="${r.id}">إعادة فتح</button>`}</div>`).join("") || '<div class="empty">لا توجد بلاغات هنا.</div>'}`;
+  $("#rf").value = f; $("#rf").onchange = (e) => { S.repFilter = e.target.value; paneReports(); };
+  document.querySelectorAll("[data-done]").forEach((b) => b.onclick = async () => { const id = +b.dataset.done, reply = (document.querySelector(`[data-r="${id}"]`).value || "").trim() || null;
+    const r = await sb.from("panel_reports").update({ status: "done", reply, seen: false }).eq("id", id); if (r.error) return toast(r.error.message);
+    Object.assign(S.reports.find((x) => x.id === id), { status: "done", reply }); toast("تم، يظهر له الرد في البانل"); render(); });
+  document.querySelectorAll("[data-open]").forEach((b) => b.onclick = async () => { const id = +b.dataset.open; const r = await sb.from("panel_reports").update({ status: "open" }).eq("id", id);
+    if (r.error) return toast(r.error.message); S.reports.find((x) => x.id === id).status = "open"; render(); });
+}
+// ---------- stats ----------
+function paneStats() {
+  const days = []; for (let i = 13; i >= 0; i--) days.push(new Date(Date.now() - i * 864e5).toISOString().slice(0, 10));
+  const act = {}; S.events.forEach((e) => { const d = e.at.slice(0, 10); (act[d] = act[d] || new Set()).add(e.user_id); });
+  const vals = days.map((d) => (act[d] ? act[d].size : 0)), mx = Math.max(1, ...vals);
+  const tools = {}; S.events.filter((e) => e.kind === "tool" || e.kind === "route").forEach((e) => { const t = (tools[e.tool] = tools[e.tool] || { n: 0, fail: 0, ms: 0, m: 0 }); t.n++; if (e.ok === false) t.fail++; if (e.ms) { t.ms += e.ms; t.m++; } });
+  const tl = Object.entries(tools).sort((a, b) => b[1].n - a[1].n), tmx = Math.max(1, ...tl.map((t) => t[1].n));
+  const chats = S.events.filter((e) => e.kind === "chat"), cf = chats.filter((e) => e.ok === false).length, errs = S.events.filter((e) => e.kind === "error").length;
+  $("#pane").innerHTML = `<div class="kpis"><div class="kpi"><b>${chats.length}</b><span>رسائل لـ Claude (30 يوما)</span></div><div class="kpi"><b>${cf}</b><span>رسائل انتهت بخطأ</span></div>
+      <div class="kpi"><b>${S.events.filter((e) => e.kind === "tool").length}</b><span>تشغيل أدوات</span></div><div class="kpi"><b>${errs}</b><span>أخطاء البانل</span></div></div>
+    <h2>المستخدمون النشطون يوميا (آخر 14 يوما)</h2><div class="box" style="padding:14px 10px 8px"><div class="bars">${vals.map((v) => `<div style="height:${(v / mx) * 100}%"><i>${v || ""}</i></div>`).join("")}</div>
+      <div class="blab">${days.map((d) => `<span>${d.slice(8)}/${d.slice(5, 7)}</span>`).join("")}</div></div>
+    <h2>الأدوات (آخر 30 يوما)</h2><div class="box" style="padding:6px 14px">${tl.map(([t, v]) => `<div class="row"><b style="min-width:110px">${esc(t)}</b><div class="meter"><i style="width:${(v.n / tmx) * 100}%"></i></div>
+      <span>${v.n} مرة${v.fail ? ` <span class="tag bad ar">${v.fail} فشل (${Math.round((v.fail / v.n) * 100)}٪)</span>` : ""}${v.m ? " · متوسط " + (v.ms / v.m / 1000).toFixed(1) + " ث" : ""}</span></div>`).join("") || '<div class="empty">لا يوجد استخدام بعد.</div>'}</div>`;
+}
+// ---------- messages ----------
+function paneMessages() {
+  $("#pane").innerHTML = `<div class="card"><b>رسالة جديدة</b><select id="mt" style="margin:10px 0;width:100%"><option value="">لكل المستخدمين</option>${S.users.map((u) => `<option value="${u.id}">${esc(u.name || u.email)}</option>`).join("")}</select>
+      <textarea id="mx" placeholder="تظهر في البانل (خلال 10 دقائق للمفتوح الآن)"></textarea>
+      <div class="tools" style="margin-top:8px"><span class="sub">تنتهي بعد</span><select id="me"><option value="">لا تنتهي</option><option value="1">يوم</option><option value="7">أسبوع</option><option value="30">شهر</option></select><button class="primary" id="ms">إرسال</button></div></div>
+    <h2>الرسائل المرسلة</h2>${S.messages.map((m) => `<div class="card"><div class="t"><b>${m.target ? esc(name(m.target)) : "لكل المستخدمين"}</b><span class="sub">${ago(m.created_at)}${m.expires_at ? " · تنتهي " + new Date(m.expires_at).toLocaleDateString("ar-EG") : ""}</span><button class="danger" data-del="${m.id}">حذف</button></div><p>${esc(m.text)}</p></div>`).join("") || '<div class="empty">لا توجد رسائل.</div>'}`;
+  $("#ms").onclick = async () => { const t = $("#mx").value.trim(); if (!t) return; const days = +$("#me").value;
+    const r = await sb.from("panel_messages").insert({ target: $("#mt").value || null, text: t, expires_at: days ? new Date(Date.now() + days * 864e5).toISOString() : null }).select();
+    if (r.error) return toast(r.error.message); S.messages.unshift(r.data[0]); toast("أرسلت"); paneMessages(); };
+  document.querySelectorAll("[data-del]").forEach((b) => b.onclick = async () => { const id = +b.dataset.del; const r = await sb.from("panel_messages").delete().eq("id", id); if (r.error) return toast(r.error.message);
+    S.messages = S.messages.filter((m) => m.id !== id); paneMessages(); });
+}
+// ---------- settings ----------
+function paneSettings() {
+  const mv = S.config.min_version || "";
+  $("#pane").innerHTML = `<div class="card"><b>إجبار التحديث</b><p>أي بانل أقدم من هذه النسخة يتوقف ويطلب التحديث قبل العمل. اتركه فارغا لإلغائه. الأحدث الآن: ${esc(S.latest || "—")}.</p>
+    <div class="tools"><input id="mv" placeholder="مثلا ${esc(S.latest || "1.0.92")}" value="${esc(mv)}" style="direction:ltr;max-width:200px"><button class="primary" id="mvs">حفظ</button></div></div>
+    <div class="card"><b>الدخول</b><p>المستخدمون يدخلون بحساب Google أو بالاسم والإيميل. صلاحياتك محمية في قاعدة البيانات نفسها، ولا يستطيع أي مستخدم تغيير صلاحياته.</p></div>`;
+  $("#mvs").onclick = async () => { const v = $("#mv").value.trim();
+    if (v && !/^\d+\.\d+\.\d+$/.test(v)) return toast("اكتب النسخة هكذا: 1.0.92");
+    const r = v ? await sb.from("panel_config").upsert({ key: "min_version", value: v, updated_at: new Date().toISOString() }) : await sb.from("panel_config").delete().eq("key", "min_version");
+    if (r.error) return toast(r.error.message); if (v) S.config.min_version = v; else delete S.config.min_version; toast(v ? "أقل نسخة الآن " + v : "ألغي إجبار التحديث"); };
+}
+sb.auth.onAuthStateChange((ev) => { if (ev === "SIGNED_IN" && !S.me) load(); });
 load().catch((e) => gate("حدث خطأ.", e.message));
 </script></body></html>
